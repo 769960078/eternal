@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EternalAPI - 使用文档</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:#05080f;
+  color:#f5f5f7;
+  font-family:'SF Pro Display','PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  line-height:1.6;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+#particle-canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+}
+
+.bg-orbs{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.bg-orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;
+  animation:orb-float 20s ease-in-out infinite;
+}
+.bg-orb:nth-child(1){
+  width:500px;height:500px;background:radial-gradient(circle,#3b82f6,transparent);
+  top:-10%;left:-5%;animation-delay:0s;animation-duration:22s;
+}
+.bg-orb:nth-child(2){
+  width:400px;height:400px;background:radial-gradient(circle,#6366f1,transparent);
+  top:40%;right:-8%;animation-delay:-7s;animation-duration:23s;
+}
+.bg-orb:nth-child(3){
+  width:350px;height:350px;background:radial-gradient(circle,#0ea5e9,transparent);
+  bottom:-8%;left:30%;animation-delay:-14s;animation-duration:25s;
+}
+.bg-orb:nth-child(4){
+  width:300px;height:300px;background:radial-gradient(circle,#8b5cf6,transparent);
+  top:60%;left:-5%;animation-delay:-5s;animation-duration:21s;
+}
+@keyframes orb-float{
+  0%,100%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(60px,-40px) scale(1.15)}
+  50%{transform:translate(-20px,30px) scale(.9)}
+  75%{transform:translate(-50px,-20px) scale(1.1)}
+}
+
+.header{
+  position:sticky;top:0;z-index:100;
+  padding:0 24px;
+  background:rgba(5,8,15,.75);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  transform:translateZ(0);
+}
+.header-inner{
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:52px;
+}
+.header-logo{
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;color:inherit;
+}
+.header-logo-icon{
+  width:30px;height:30px;
+  border-radius:8px;
+  background:linear-gradient(135deg,#3b82f6,#6366f1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#fff;
+  box-shadow:0 0 24px rgba(59,130,246,.35);
+  transition:box-shadow .3s;
+}
+.header-logo:hover .header-logo-icon{box-shadow:0 0 36px rgba(59,130,246,.55)}
+.header-logo-text{
+  font-size:17px;font-weight:600;letter-spacing:-.2px;
+}
+.header-nav{display:flex;gap:4px;align-items:center}
+.header-nav a{
+  text-decoration:none;color:rgba(255,255,255,.6);
+  font-size:13px;font-weight:500;padding:6px 14px;border-radius:8px;
+  transition:all .25s;position:relative;
+}
+.header-nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.header-nav a.primary{
+  background:linear-gradient(135deg,#3b82f6,#4f46e5);color:#fff;
+  box-shadow:0 0 20px rgba(59,130,246,.2),0 2px 8px rgba(59,130,246,.15);
+  overflow:hidden;
+}
+.header-nav a.primary::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.15) 50%,transparent 60%);
+  transform:translateX(-100%);transition:transform .6s;
+}
+.header-nav a.primary:hover::after{transform:translateX(100%)}
+.header-nav a.primary:hover{box-shadow:0 0 30px rgba(59,130,246,.4),0 4px 14px rgba(59,130,246,.25);transform:translateY(-1px)}
+
+.page{
+  position:relative;z-index:1;
+  max-width:1100px;margin:0 auto;
+  padding:0 24px 80px;
+}
+
+.hero{
+  padding:100px 0 56px;text-align:center;position:relative;
+}
+.hero-badge{
+  display:inline-block;padding:5px 16px;
+  background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.18);
+  border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;
+  color:#60a5fa;margin-bottom:24px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  animation:badge-float 3s ease-in-out infinite;
+}
+@keyframes badge-float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+.hero h1{
+  font-size:clamp(38px,6vw,58px);font-weight:700;letter-spacing:-1.5px;
+  background:linear-gradient(180deg,#fff 0%,rgba(180,200,240,.75) 60%,rgba(100,150,220,.5) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:20px;line-height:1.1;
+}
+.hero-desc{
+  font-size:clamp(16px,2.2vw,19px);color:rgba(255,255,255,.45);
+  max-width:620px;margin:0 auto 36px;line-height:1.75;
+}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 28px;border-radius:14px;font-size:15px;font-weight:600;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:all .35s cubic-bezier(.25,.8,.25,1.2);
+  font-family:inherit;letter-spacing:-.1px;
+  position:relative;overflow:hidden;outline:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.96) !important}
+.btn-primary{
+  background:linear-gradient(135deg,#2563eb,#4f46e5);
+  color:#fff;
+  box-shadow:0 0 32px rgba(59,130,246,.3),0 4px 18px rgba(59,130,246,.18);
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 48px rgba(59,130,246,.45),0 8px 28px rgba(59,130,246,.28);
+}
+.btn-primary::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.12) 50%,transparent 70%);
+  transform:translateX(-100%);transition:transform .5s;
+}
+.btn-primary:hover::after{transform:translateX(100%)}
+
+.btn-outline{
+  background:rgba(255,255,255,.03);color:#fff;
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.btn-outline:hover{
+  background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);
+  transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+
+.ripple{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transform:scale(0);animation:ripple-anim .6s ease-out;
+  pointer-events:none;
+}
+@keyframes ripple-anim{to{transform:scale(4);opacity:0}}
+
+.glass-card{
+  background:rgba(255,255,255,.025);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:20px;
+  box-shadow:0 8px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03);
+  transition:transform .4s cubic-bezier(.25,.8,.25,1),box-shadow .4s,border-color .4s;
+}
+.glass-card:hover{
+  border-color:rgba(255,255,255,.09);
+  box-shadow:0 12px 48px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.info-bar{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:12px;margin-bottom:48px;
+}
+.info-item{
+  padding:22px 24px;text-align:center;cursor:default;
+}
+.info-item:hover{transform:translateY(-3px)}
+.info-item .icon{
+  font-size:22px;margin-bottom:8px;display:block;
+}
+.info-item .label{
+  font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  color:rgba(255,255,255,.3);margin-bottom:6px;
+}
+.info-item .value{
+  font-size:14px;font-weight:500;color:#cbd5e1;
+  font-family:'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+  word-break:break-all;
+}
+
+.content-grid{display:flex;flex-direction:column;gap:24px}
+
+.section-card{padding:40px 44px;overflow:hidden}
+@media(max-width:640px){.section-card{padding:24px 20px}}
+
+.section-card h2{
+  font-size:28px;font-weight:700;letter-spacing:-.5px;
+  margin-bottom:10px;color:#fff;
+}
+.section-card h3{
+  font-size:20px;font-weight:600;letter-spacing:-.3px;
+  margin:36px 0 14px;color:#f5f5f7;
+}
+.section-card h3:first-of-type{margin-top:0}
+.section-card h4{
+  font-size:15px;font-weight:600;color:#e2e8f0;
+  margin:28px 0 8px;
+}
+.section-card p{
+  font-size:15px;color:rgba(255,255,255,.5);line-height:1.8;
+  margin-bottom:12px;
+}
+.section-card p strong{color:rgba(255,255,255,.7);font-weight:600}
+
+.endpoint{
+  display:flex;align-items:center;gap:12px;
+  margin:14px 0;padding:12px 18px;
+  background:rgba(255,255,255,.02);border-radius:12px;
+  border:1px solid rgba(255,255,255,.04);
+  transition:border-color .3s,background .3s;
+}
+.endpoint:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)}
+.method{
+  padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;
+  letter-spacing:.5px;flex-shrink:0;font-family:'SF Mono','Fira Code','Consolas',monospace;
+}
+.method.post{background:rgba(16,185,129,.1);color:#34d399}
+.method.get{background:rgba(59,130,246,.1);color:#60a5fa}
+.path{
+  font-size:13px;color:#94a3b8;
+  font-family:'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+  word-break:break-all;
+}
+
+pre{
+  margin:14px 0 22px;padding:20px 24px;
+  background:rgba(0,0,0,.55);border-radius:14px;
+  border:1px solid rgba(255,255,255,.04);
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  transition:border-color .3s;
+}
+pre:hover{border-color:rgba(255,255,255,.08)}
+pre code{
+  font-size:13px;line-height:1.8;color:#94a3b8;
+  font-family:'SF Mono','Fira Code','Cascadia Code','Consolas',monospace;
+  white-space:pre;
+}
+
+.note-box{
+  margin:18px 0;padding:16px 20px;
+  background:rgba(59,130,246,.05);
+  border:1px solid rgba(59,130,246,.1);
+  border-radius:14px;font-size:14px;color:rgba(255,255,255,.5);
+  line-height:1.75;transition:border-color .3s;
+}
+.note-box:hover{border-color:rgba(59,130,246,.2)}
+.note-box strong{color:#60a5fa}
+
+ol,ul{margin:8px 0 16px 20px;color:rgba(255,255,255,.5);font-size:15px;line-height:2}
+li::marker{color:rgba(255,255,255,.2)}
+
+.highlight-text{color:#60a5fa;font-weight:500}
+
+.divider{border:none;border-top:1px solid rgba(255,255,255,.05);margin:14px 0}
+
+.model-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:8px;margin:14px 0;
+}
+.model-chip{
+  padding:10px 14px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:10px;font-size:13px;color:rgba(255,255,255,.5);
+  font-family:'SF Mono','Fira Code','Consolas',monospace;
+  transition:all .25s;cursor:default;
+}
+.model-chip:hover{
+  background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.18);
+  color:rgba(255,255,255,.7);transform:translateY(-1px);
+}
+
+.tag{
+  display:inline-block;padding:2px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;letter-spacing:.3px;
+  vertical-align:middle;
+}
+.tag-green{background:rgba(16,185,129,.1);color:#34d399}
+.tag-blue{background:rgba(59,130,246,.1);color:#60a5fa}
+
+.faq-item{margin-bottom:18px;padding:14px 16px;border-radius:12px;transition:background .3s}
+.faq-item:hover{background:rgba(255,255,255,.015)}
+.faq-q{font-size:15px;font-weight:600;color:#e2e8f0;margin-bottom:8px}
+.faq-a{font-size:14px;color:rgba(255,255,255,.45);line-height:1.75}
+
+.contact-card{
+  margin-top:36px;padding:32px 36px;text-align:center;
+  background:rgba(59,130,246,.03);
+  border:1px solid rgba(59,130,246,.08);
+  border-radius:18px;transition:border-color .3s;
+}
+.contact-card:hover{border-color:rgba(59,130,246,.15)}
+.contact-card h3{color:#fff;margin-top:0;font-size:19px}
+.contact-card .qq{
+  font-size:26px;font-weight:700;color:#60a5fa;letter-spacing:1px;
+  transition:color .3s;
+}
+.contact-card:hover .qq{color:#93c5fd}
+
+.footer{
+  position:relative;z-index:1;
+  text-align:center;padding:48px 24px;
+  color:rgba(255,255,255,.15);font-size:12px;letter-spacing:.5px;
+}
+
+@media(max-width:640px){
+  .header-nav{display:none}
+  .hero{padding:60px 0 36px}
+  .info-bar{grid-template-columns:1fr 1fr;gap:8px}
+  .info-item{padding:16px 12px}
+  .info-item .value{font-size:11px}
+  pre{padding:14px 16px}
+  pre code{font-size:11px;line-height:1.6}
+  .path{font-size:10px}
+  .section-card h2{font-size:22px}
+  .section-card h3{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="bg-orbs">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<header class="header">
+  <div class="header-inner">
+    <a class="header-logo" href="#">
+      <div class="header-logo-icon">E</div>
+      <span class="header-logo-text">EternalAPI</span>
+    </a>
+    <nav class="header-nav">
+      <a href="#overview">概述</a>
+      <a href="#models">模型调用</a>
+      <a href="#guide">使用指南</a>
+      <a href="#faq">常见问题</a>
+      <a class="primary" href="https://tokeneternal.com" target="_blank">访问官网</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+
+<section class="hero" data-parallax="0.15">
+  <div class="hero-badge">API 中转平台</div>
+  <h1>EternalAPI 使用文档</h1>
+  <p class="hero-desc">聚合 OpenAI、Anthropic、Google、DeepSeek 等主流大模型，通过统一、稳定的 API 接口对外提供调用。</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="https://tokeneternal.com" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      前往控制台
+    </a>
+    <a class="btn btn-outline" href="#models">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      查看模型列表
+    </a>
+  </div>
+</section>
+
+<div class="info-bar" id="overview">
+  <div class="glass-card info-item" data-parallax="0.06">
+    <span class="icon">🔗</span>
+    <div class="label">API 基础地址</div>
+    <div class="value">https://tokeneternal.com</div>
+  </div>
+  <div class="glass-card info-item" data-parallax="0.08">
+    <span class="icon">🔐</span>
+    <div class="label">认证方式</div>
+    <div class="value">Bearer Token</div>
+  </div>
+  <div class="glass-card info-item" data-parallax="0.1">
+    <span class="icon">🔑</span>
+    <div class="label">密钥获取</div>
+    <div class="value">网站后台 → API 密钥管理</div>
+  </div>
+  <div class="glass-card info-item" data-parallax="0.12">
+    <span class="icon">🔌</span>
+    <div class="label">兼容性</div>
+    <div class="value">OpenAI SDK / LangChain</div>
+  </div>
+</div>
+
+<div class="content-grid" id="models">
+
+<div class="glass-card section-card" data-parallax="0.04">
+  <h2>一、模型调用方法</h2>
+  <p>所有模型均兼容标准客户端（如 OpenAI 官方 SDK、LangChain 等），只需替换 <strong>base_url</strong> 和密钥即可。</p>
+</div>
+
+<div class="glass-card section-card" data-parallax="0.04">
+  <h3>1. OpenAI 模型</h3>
+  <p>支持 GPT-4o、GPT-4o-mini、GPT-4-turbo、o1-preview、o1-mini 等模型。接口路径完全兼容 OpenAI 官方 Chat Completions API。</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span>
+    <span class="path">https://tokeneternal.com/v1/chat/completions</span>
+  </div>
+
+  <h4>cURL 示例</h4>
+  <pre><code>curl https://tokeneternal.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-your-key" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "你好"}]
+  }'</code></pre>
+
+  <h4>Python SDK 示例</h4>
+  <pre><code>from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://tokeneternal.com/v1",
+    api_key="sk-your-key"
+)
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "你好"}]
+)</code></pre>
+
+  <p>可用模型：<span class="highlight-text">gpt-4o</span>、<span class="highlight-text">gpt-4o-mini</span>、<span class="highlight-text">gpt-4-turbo</span>、<span class="highlight-text">o1-preview</span>、<span class="highlight-text">o1-mini</span> 等，具体列表请查看网站「模型广场」。</p>
+</div>
+
+<div class="glass-card section-card" data-parallax="0.04">
+  <h3>2. Anthropic 模型（Claude 系列）</h3>
+  <p>提供两种调用方式，任选其一即可。</p>
+
+  <h4>方式一：OpenAI 兼容接口 <span class="tag tag-green">推荐</span></h4>
+  <p>直接使用 <span class="highlight-text">/v1/chat/completions</span>，模型名填写 Claude 系列模型 ID，方便迁移已有项目。</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span>
+    <span class="path">https://tokeneternal.com/v1/chat/completions</span>
+  </div>
+
+  <pre><code>curl https://tokeneternal.com/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-3-5-sonnet-20240620",
+    "messages": [{"role": "user", "content": "介绍一下你自己"}]
+  }'</code></pre>
+
+  <h4>方式二：原生 Anthropic Messages API</h4>
+  <p>路径为 <span class="highlight-text">/v1/messages</span>，完全兼容 Anthropic 官方格式，需传入 Anthropic 版本头。</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span>
+    <span class="path">https://tokeneternal.com/v1/messages</span>
+  </div>
+
+  <pre><code>curl https://tokeneternal.com/v1/messages \
+  -H "x-api-key: sk-your-key" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-3-5-sonnet-20240620",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "你好，Claude"}]
+  }'</code></pre>
+
+  <div class="note-box">
+    <strong>注意：</strong>原生接口的密钥直接放在 <strong>x-api-key</strong> 头中，无需 <strong>Bearer</strong> 前缀。
+  </div>
+
+  <p>可用模型：</p>
+  <div class="model-grid">
+    <span class="model-chip">claude-3-5-sonnet-20240620</span>
+    <span class="model-chip">claude-3-opus-20240229</span>
+    <span class="model-chip">claude-3-haiku-20240307</span>
+  </div>
+</div>
+
+<div class="glass-card section-card" data-parallax="0.04">
+  <h3>3. Google 模型（Gemini 系列）</h3>
+  <p>同样提供两种接入方式。</p>
+
+  <h4>方式一：OpenAI 兼容接口 <span class="tag tag-green">最简单</span></h4>
+  <p>将模型名指定为 Gemini 系列即可，底层会自动转换格式。</p>
+
+  <pre><code>from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://tokeneternal.com/v1",
+    api_key="sk-your-key"
+)
+response = client.chat.completions.create(
+    model="gemini-1.5-pro",
+    messages=[{"role": "user", "content": "用中文写一首诗"}]
+)</code></pre>
+
+  <h4>方式二：原生 Gemini API</h4>
+  <p>使用 <span class="highlight-text">/v1/models/{model}:generateContent</span> 端点，格式与 Google AI 官方一致。密钥推荐使用 <span class="highlight-text">x-goog-api-key</span> 头。</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span>
+    <span class="path">https://tokeneternal.com/v1/models/gemini-1.5-pro:generateContent</span>
+  </div>
+
+  <pre><code>curl "https://tokeneternal.com/v1/models/gemini-1.5-pro:generateContent" \
+  -H "x-goog-api-key: sk-your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contents": [{"parts":[{"text": "解释一下量子计算"}]}]
+  }'</code></pre>
+
+  <p>可用模型：</p>
+  <div class="model-grid">
+    <span class="model-chip">gemini-1.5-pro</span>
+    <span class="model-chip">gemini-1.5-flash</span>
+    <span class="model-chip">gemini-pro</span>
+  </div>
+</div>
+
+<div class="glass-card section-card" data-parallax="0.04">
+  <h3>4. DeepSeek 模型</h3>
+  <p>DeepSeek 接口完全兼容 OpenAI 格式，调用最为简便。</p>
+
+  <div class="endpoint">
+    <span class="method post">POST</span>
+    <span class="path">https://tokeneternal.com/v1/chat/completions</span>
+  </div>
+
+  <h4>cURL 示例</h4>
+  <pre><code>curl https://tokeneternal.com/v1/chat/completions \
+  -H "Authorization: Bearer sk-your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-chat",
+    "messages": [{"role": "user", "content": "写一段快速排序代码"}]
+  }'</code></pre>
+
+  <h4>Python 示例</h4>
+  <pre><code>from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://tokeneternal.com/v1",
+    api_key="sk-your-key"
+)
+response = client.chat.completions.create(
+    model="deepseek-reasoner",
+    messages=[{"role": "user", "content": "9.11和9.8哪个大？"}]
+)</code></pre>
+
+  <p>可用模型：</p>
+  <div class="model-grid">
+    <span class="model-chip">deepseek-chat <small style="color:rgba(255,255,255,.25)">(V3)</small></span>
+    <span class="model-chip">deepseek-reasoner <small style="color:rgba(255,255,255,.25)">(R1)</small></span>
+  </div>
+
+  <hr class="divider">
+  <div class="note-box" style="margin-top:22px">
+    <strong>💡 提示：</strong>以上所有模型，只需掌握 OpenAI 兼容格式，即可一招通吃。对于有特殊需求的用户，我们也提供原厂风格接口，保持最大灵活性。
+  </div>
+</div>
+
+<div class="glass-card section-card" id="guide" data-parallax="0.03">
+  <h2>二、网站使用指南</h2>
+
+  <h3>1. 获取 API 密钥</h3>
+  <p>进入 <strong>「个人中心」→「API 密钥」</strong>，点击「创建密钥」，自定义名称后即可生成。请妥善保管密钥，切勿泄露。</p>
+
+  <h3>2. 模型广场与价格</h3>
+  <ul>
+    <li>「模型广场」页面展示所有可用模型，包含型号、上下文长度、输入/输出单价（按量计费）以及状态（可用/维护）。</li>
+    <li>我们采用 <strong>按量计费</strong>，用多少扣多少，无最低消费。你可以在「费用中心」实时查看余额、消费明细和充值。</li>
+  </ul>
+
+  <h3>3. 在线测试与调试</h3>
+  <p>进入 <strong>「API 调试」</strong>，可直接在网页中输入 messages，选择模型，点击发送查看返回结果。非常适合前期测试和问题定位，无需写一行代码。</p>
+
+  <h3>4. 速率限制与用量监控</h3>
+  <ul>
+    <li>不同订阅级别对应不同 QPS 上限，请在「账户概览」查看你的限制。</li>
+    <li>建议在代码中使用 <strong>指数退避重试策略</strong>，以应对临时流控。</li>
+    <li>「统计报表」页面提供调用次数、Token 消耗、延迟分布等可视化图表。</li>
+  </ul>
+
+  <h3>5. 日志与安全</h3>
+  <ul>
+    <li>所有请求均通过 <strong>HTTPS</strong> 加密传输。</li>
+    <li>平台不记录你的输入和输出内容，只会统计 Token 用量用于计费。</li>
+    <li>如发现异常调用，可在「安全设置」中快速轮换密钥或设置 IP 白名单。</li>
+  </ul>
+</div>
+
+<div class="glass-card section-card" id="faq" data-parallax="0.03">
+  <h2>三、常见问题</h2>
+
+  <div class="faq-item">
+    <div class="faq-q">🔴 报 401 错误</div>
+    <div class="faq-a">检查密钥是否正确，是否已过期或被删除。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">🟡 报 404 模型不存在</div>
+    <div class="faq-a">请确认模型名称拼写，参考模型广场中的准确 ID。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">⏱️ 返回超时</div>
+    <div class="faq-a">长文本生成可适当调大客户端的 timeout 参数（120 秒以上）。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">💰 余额不足</div>
+    <div class="faq-a">前往费用中心充值，余额实时生效。</div>
+  </div>
+
+  <div class="contact-card">
+    <h3>需要帮助？</h3>
+    <p style="color:rgba(255,255,255,.4);margin-bottom:16px">如果在使用过程中遇到任何问题，欢迎联系我们的客服 QQ。我们会尽快为你处理。</p>
+    <p class="qq">客服 QQ：193747838</p>
+    <p style="font-size:12px;color:rgba(255,255,255,.2);margin-top:10px">添加时请备注「Eternal API 用户」</p>
+    <p style="font-size:12px;color:rgba(255,255,255,.15);margin-top:4px">服务时间：工作日 9:00 - 22:00，周末与节假日可能回复稍慢，敬请谅解。</p>
+  </div>
+</div>
+
+<div class="glass-card section-card" style="text-align:center" data-parallax="0.03">
+  <p style="font-size:17px;color:rgba(255,255,255,.45);margin:0">
+    再次感谢你选择 <strong style="color:#60a5fa">EternalAPI 中转站</strong>！我们会持续接入更多模型、优化路由稳定性，助力你的 AI 应用高效运行。
+  </p>
+</div>
+
+</div>
+
+<footer class="footer">
+  <p>&copy; 2026 EternalAPI. All rights reserved.</p>
+</footer>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============================================
+     1. PARTICLE CANVAS - 粒子网络效果
+     ============================================ */
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  const particles = [];
+  const PARTICLE_COUNT = 90;
+  const CONNECTION_DIST = 140;
+  const MOUSE_RADIUS = 150;
+  let mouseX = -9999, mouseY = -9999;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for(let i = 0; i < PARTICLE_COUNT; i++){
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 1.5 + 0.6,
+      baseAlpha: Math.random() * 0.4 + 0.2
+    });
+  }
+
+  document.addEventListener('mousemove', function(e){
+    mouseX = e.clientX; mouseY = e.clientY;
+  });
+  document.addEventListener('mouseleave', function(){
+    mouseX = -9999; mouseY = -9999;
+  });
+
+  function drawParticles(){
+    ctx.clearRect(0, 0, w, h);
+
+    for(let i = 0; i < PARTICLE_COUNT; i++){
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = w;
+      if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h;
+      if(p.y > h) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      const alpha = mouseX > 0 ? p.baseAlpha * 0.5 : p.baseAlpha;
+      ctx.fillStyle = 'rgba(148,180,240,' + alpha + ')';
+      ctx.fill();
+
+      for(let j = i + 1; j < PARTICLE_COUNT; j++){
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if(dist < CONNECTION_DIST){
+          const lineAlpha = (1 - dist / CONNECTION_DIST) * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = 'rgba(148,180,240,' + lineAlpha + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+
+      if(mouseX > 0){
+        const mdx = p.x - mouseX, mdy = p.y - mouseY;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if(mdist < MOUSE_RADIUS){
+          const force = (1 - mdist / MOUSE_RADIUS) * 1.2;
+          p.vx += (mdx / mdist) * force * 0.03;
+          p.vy += (mdy / mdist) * force * 0.03;
+          const maxSpeed = 1.2;
+          const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+          if(speed > maxSpeed){
+            p.vx = p.vx / speed * maxSpeed;
+            p.vy = p.vy / speed * maxSpeed;
+          }
+        }
+      }
+    }
+    requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+
+  /* ============================================
+     2. PARALLAX SCROLL - 视差滚动
+     ============================================ */
+  const parallaxEls = document.querySelectorAll('[data-parallax]');
+  function updateParallax(){
+    const scrollY = window.pageYOffset;
+    parallaxEls.forEach(function(el){
+      const speed = parseFloat(el.getAttribute('data-parallax'));
+      const offset = scrollY * speed;
+      el.style.transform = 'translateY(' + offset + 'px)';
+    });
+  }
+  window.addEventListener('scroll', updateParallax, { passive: true });
+  updateParallax();
+
+  /* ============================================
+     3. BUTTON RIPPLE - 按钮涟漪效果
+     ============================================ */
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('.btn');
+    if(!btn) return;
+
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', function(){ ripple.remove(); });
+  });
+
+  /* ============================================
+     4. SCROLL REVEAL - 滚动渐入
+     ============================================ */
+  const observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.glass-card.section-card').forEach(function(card, i){
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity .7s ease ' + (i * 0.06) + 's, transform .7s ease ' + (i * 0.06) + 's';
+    observer.observe(card);
+  });
+
+})();
+</script>
+</body>
+</html>
